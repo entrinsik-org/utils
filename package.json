@@ -1,6 +1,6 @@
 {
   "name": "ent-utils",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Utility classes and functions",
   "main": "lib/index.js",
   "directories": {
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "URIjs": "^1.14.2",
+    "joi": "^6.0.8",
     "lodash": "^3.5.0"
   }
 }
