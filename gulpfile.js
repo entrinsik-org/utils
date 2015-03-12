@@ -65,7 +65,7 @@ gulp.task('lint', function () {
 });
 
 gulp.task('push', function (done) {
-    git.push('origin', 'master', done);
+    git.push('origin', 'master', {args: '--tags'}, done);
 });
 
 gulp.task('release', ['lint', 'test', 'patch']);
