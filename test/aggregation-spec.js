@@ -339,4 +339,134 @@ describe('AggBuilder', function () {
             }
         });
     });
+
+    it('should support a bucket reducer mapper', function () {
+        new Aggregation()
+            .aggregation('states', Aggregation.terms('state'), function (agg) {
+                agg
+                    .aggregation('total_amount', Aggregation.sum('amount'))
+                    .mapper(Aggregation.bucketReducer(function (value, bucket) {
+                        return [bucket.key, bucket.doc_count, value.total_amount];
+                    }));
+            })
+            .map(require('./state_sum_amount.json')).should.deep.equal({
+            "states": {
+                "CA": [
+                    "CA",
+                    31,
+                    421287.5
+                ],
+                "IL": [
+                    "IL",
+                    16,
+                    391640
+                ],
+                "MA": [
+                    "MA",
+                    15,
+                    245480
+                ],
+                "NC": [
+                    "NC",
+                    67,
+                    1165652
+                ],
+                "NJ": [
+                    "NJ",
+                    22,
+                    399075
+                ],
+                "NY": [
+                    "NY",
+                    21,
+                    419935
+                ],
+                "OH": [
+                    "OH",
+                    16,
+                    340320
+                ],
+                "PA": [
+                    "PA",
+                    21,
+                    299419
+                ],
+                "SC": [
+                    "SC",
+                    11,
+                    156672
+                ],
+                "TX": [
+                    "TX",
+                    16,
+                    344090
+                ]
+            }
+        });
+    });
+
+    it('should support a bucket mapper mapper', function () {
+        new Aggregation()
+            .aggregation('states', Aggregation.terms('state'), function (agg) {
+                agg
+                    .aggregation('total_amount', Aggregation.sum('amount'))
+                    .mapper(Aggregation.bucketMapper(function (value, bucket) {
+                        return [bucket.key, bucket.doc_count, value.total_amount];
+                    }));
+            })
+            .map(require('./state_sum_amount.json')).should.deep.equal({
+            "states": [
+                [
+                    "NC",
+                    67,
+                    1165652
+                ],
+                [
+                    "CA",
+                    31,
+                    421287.5
+                ],
+                [
+                    "NJ",
+                    22,
+                    399075
+                ],
+                [
+                    "NY",
+                    21,
+                    419935
+                ],
+                [
+                    "PA",
+                    21,
+                    299419
+                ],
+                [
+                    "IL",
+                    16,
+                    391640
+                ],
+                [
+                    "OH",
+                    16,
+                    340320
+                ],
+                [
+                    "TX",
+                    16,
+                    344090
+                ],
+                [
+                    "MA",
+                    15,
+                    245480
+                ],
+                [
+                    "SC",
+                    11,
+                    156672
+                ]
+            ]
+        });
+    });
 });
