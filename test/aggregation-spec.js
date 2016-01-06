@@ -184,7 +184,7 @@ describe('AggBuilder', function () {
                     "count": 16,
                     "max_amount": 70400,
                     "min_amount": 8750,
-                    "total_amount": 391640,
+                    "total_amount": 391640
                 },
                 "MA": {
                     "avg_amount": 16365.333333333334,
@@ -286,6 +286,38 @@ describe('AggBuilder', function () {
 
         agg.map(require('./state_value_count.json')).should.deep.equal({
             "state_count": 378
+        });
+    });
+
+    it('should support extended_stats', function () {
+        var agg = new Aggregation()
+            .aggregation('amount_stats', Aggregation.extendedStats('amount'));
+
+        agg.build().should.deep.equal({
+            "aggregations": {
+                "amount_stats": {
+                    "extended_stats": {
+                        "field": "amount"
+                    }
+                }
+            }
+        });
+
+        agg.map(require('./amount_extended_stats.json')).should.deep.equal({
+            "amount_stats": {
+                "avg": 18098.435515873014,
+                "count": 504,
+                "max": 107360,
+                "min": 0,
+                "std_deviation": 12607.430829331466,
+                "std_deviation_bounds": {
+                    "lower": -7116.426142789918,
+                    "upper": 43313.29717453595
+                },
+                "sum": 9121611.5,
+                "sum_of_squares": 245196342840.25,
+                "variance": 158947312.1163775
+            }
         });
     });
 });
