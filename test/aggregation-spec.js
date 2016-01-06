@@ -345,7 +345,7 @@ describe('AggBuilder', function () {
             .aggregation('states', Aggregation.terms('state'), function (agg) {
                 agg
                     .aggregation('total_amount', Aggregation.sum('amount'))
-                    .mapper(Aggregation.bucketReducer(function (value, bucket) {
+                    .mapper(Aggregation.bucketReducer(function (bucket, value) {
                         return [bucket.key, bucket.doc_count, value.total_amount];
                     }));
             })
@@ -410,7 +410,7 @@ describe('AggBuilder', function () {
             .aggregation('states', Aggregation.terms('state'), function (agg) {
                 agg
                     .aggregation('total_amount', Aggregation.sum('amount'))
-                    .mapper(Aggregation.bucketMapper(function (value, bucket) {
+                    .mapper(Aggregation.bucketMapper(function (bucket, value) {
                         return [bucket.key, bucket.doc_count, value.total_amount];
                     }));
             })
