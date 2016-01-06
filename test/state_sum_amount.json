@@ -1,0 +1,92 @@
+{
+  "took": 29,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 504,
+    "max_score": 0,
+    "hits": []
+  },
+  "aggregations": {
+    "states": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 142,
+      "buckets": [
+        {
+          "key": "NC",
+          "doc_count": 67,
+          "total_amount": {
+            "value": 1165652
+          }
+        },
+        {
+          "key": "CA",
+          "doc_count": 31,
+          "total_amount": {
+            "value": 421287.5
+          }
+        },
+        {
+          "key": "NJ",
+          "doc_count": 22,
+          "total_amount": {
+            "value": 399075
+          }
+        },
+        {
+          "key": "NY",
+          "doc_count": 21,
+          "total_amount": {
+            "value": 419935
+          }
+        },
+        {
+          "key": "PA",
+          "doc_count": 21,
+          "total_amount": {
+            "value": 299419
+          }
+        },
+        {
+          "key": "IL",
+          "doc_count": 16,
+          "total_amount": {
+            "value": 391640
+          }
+        },
+        {
+          "key": "OH",
+          "doc_count": 16,
+          "total_amount": {
+            "value": 340320
+          }
+        },
+        {
+          "key": "TX",
+          "doc_count": 16,
+          "total_amount": {
+            "value": 344090
+          }
+        },
+        {
+          "key": "MA",
+          "doc_count": 15,
+          "total_amount": {
+            "value": 245480
+          }
+        },
+        {
+          "key": "SC",
+          "doc_count": 11,
+          "total_amount": {
+            "value": 156672
+          }
+        }
+      ]
+    }
+  }
+}

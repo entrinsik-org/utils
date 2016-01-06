@@ -1,0 +1,62 @@
+{
+  "took": 6,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 504,
+    "max_score": 0,
+    "hits": []
+  },
+  "aggregations": {
+    "states": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 142,
+      "buckets": [
+        {
+          "key": "NC",
+          "doc_count": 67
+        },
+        {
+          "key": "CA",
+          "doc_count": 31
+        },
+        {
+          "key": "NJ",
+          "doc_count": 22
+        },
+        {
+          "key": "NY",
+          "doc_count": 21
+        },
+        {
+          "key": "PA",
+          "doc_count": 21
+        },
+        {
+          "key": "IL",
+          "doc_count": 16
+        },
+        {
+          "key": "OH",
+          "doc_count": 16
+        },
+        {
+          "key": "TX",
+          "doc_count": 16
+        },
+        {
+          "key": "MA",
+          "doc_count": 15
+        },
+        {
+          "key": "SC",
+          "doc_count": 11
+        }
+      ]
+    }
+  }
+}
