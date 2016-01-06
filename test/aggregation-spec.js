@@ -320,4 +320,23 @@ describe('AggBuilder', function () {
             }
         });
     });
+
+    it('should configure the aggregation', function () {
+        var agg = new Aggregation()
+            .aggregation('states', Aggregation.terms('state'), function (agg) {
+                agg.configure({ sort: { field: 'asc' } });
+            })
+            .build();
+
+        agg.should.deep.equal({
+            "aggregations": {
+                "states": {
+                    "terms": {
+                        "field": "state",
+                        "sort": { "field": "asc" }
+                    }
+                }
+            }
+        });
+    });
 });
