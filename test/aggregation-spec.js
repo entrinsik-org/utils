@@ -139,6 +139,9 @@ describe('AggBuilder', function () {
         var agg = new Aggregation()
             .agg('states', Aggregation.terms('state'), function (agg) {
                 agg.agg('total_amount', Aggregation.sum('amount'));
+                agg.agg('avg_amount', Aggregation.avg('amount'));
+                agg.agg('max_amount', Aggregation.max('amount'));
+                agg.agg('min_amount', Aggregation.min('amount'));
             });
 
         agg.build().should.deep.equal({
@@ -148,6 +151,15 @@ describe('AggBuilder', function () {
                         field: 'state'
                     },
                     aggregations: {
+                        avg_amount: {
+                            avg: { field: 'amount' }
+                        },
+                        max_amount: {
+                            max: { field: 'amount' }
+                        },
+                        min_amount: {
+                            min: { field: 'amount' }
+                        },
                         total_amount: {
                             sum: { field: 'amount' }
                         }
@@ -159,18 +171,121 @@ describe('AggBuilder', function () {
         var res = agg.map(require('./state_sum_amount.json'));
 
         res.should.deep.equal({
-            states: {
-                CA: { count: 31, total_amount: 421287.5 },
-                IL: { count: 16, total_amount: 391640 },
-                MA: { count: 15, total_amount: 245480 },
-                NC: { count: 67, total_amount: 1165652 },
-                NJ: { count: 22, total_amount: 399075 },
-                NY: { count: 21, total_amount: 419935 },
-                OH: { count: 16, total_amount: 340320 },
-                PA: { count: 21, total_amount: 299419 },
-                SC: { count: 11, total_amount: 156672 },
-                TX: { count: 16, total_amount: 344090 }
+            "states": {
+                "CA": {
+                    "avg_amount": 13589.91935483871,
+                    "count": 31,
+                    "max_amount": 30000,
+                    "min_amount": 3500,
+                    "total_amount": 421287.5
+                },
+                "IL": {
+                    "avg_amount": 24477.5,
+                    "count": 16,
+                    "max_amount": 70400,
+                    "min_amount": 8750,
+                    "total_amount": 391640,
+                },
+                "MA": {
+                    "avg_amount": 16365.333333333334,
+                    "count": 15,
+                    "max_amount": 44000,
+                    "min_amount": 4500,
+                    "total_amount": 245480
+                },
+                "NC": {
+                    "avg_amount": 17397.79104477612,
+                    "count": 67,
+                    "max_amount": 73000,
+                    "min_amount": 1,
+                    "total_amount": 1165652
+                },
+                "NJ": {
+                    "avg_amount": 18139.772727272728,
+                    "count": 22,
+                    "max_amount": 45000,
+                    "min_amount": 2500,
+                    "total_amount": 399075
+                },
+                "NY": {
+                    "avg_amount": 19996.904761904763,
+                    "count": 21,
+                    "max_amount": 52800,
+                    "min_amount": 6500,
+                    "total_amount": 419935
+                },
+                "OH": {
+                    "avg_amount": 21270,
+                    "count": 16,
+                    "max_amount": 66560,
+                    "min_amount": 4500,
+                    "total_amount": 340320
+                },
+                "PA": {
+                    "avg_amount": 14258.047619047618,
+                    "count": 21,
+                    "max_amount": 25000,
+                    "min_amount": 3500,
+                    "total_amount": 299419
+                },
+                "SC": {
+                    "avg_amount": 14242.90909090909,
+                    "count": 11,
+                    "max_amount": 28072,
+                    "min_amount": 4350,
+                    "total_amount": 156672
+                },
+                "TX": {
+                    "avg_amount": 21505.625,
+                    "count": 16,
+                    "max_amount": 58080,
+                    "min_amount": 5000,
+                    "total_amount": 344090
+                }
             }
+        });
+    });
+
+    it('should support stats', function () {
+        var agg = new Aggregation()
+            .aggregation('amount_stats', Aggregation.stats('amount'));
+
+        agg.build().should.deep.equal({
+            "aggregations": {
+                "amount_stats": {
+                    "stats": {
+                        "field": "amount"
+                    }
+                }
+            }
+        });
+        agg.map(require('./amount_stats.json')).should.deep.equal({
+            amount_stats: {
+                "count": 504,
+                "min": 0,
+                "max": 107360,
+                "avg": 18098.435515873014,
+                "sum": 9121611.5
+            }
+        });
+    });
+
+    it('should support value_count', function () {
+        var agg = new Aggregation()
+            .aggregation('state_count', Aggregation.valueCount('state'));
+
+        agg.build().should.deep.equal({
+            "aggregations": {
+                "state_count": {
+                    "value_count": {
+                        "field": "state"
+                    }
+                }
+            }
+        });
+
+        agg.map(require('./state_value_count.json')).should.deep.equal({
+            "state_count": 378
         });
     });
 });

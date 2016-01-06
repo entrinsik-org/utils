@@ -1,5 +1,5 @@
 {
-  "took": 29,
+  "took": 43,
   "timed_out": false,
   "_shards": {
     "total": 1,
@@ -21,6 +21,15 @@
           "doc_count": 67,
           "total_amount": {
             "value": 1165652
+          },
+          "avg_amount": {
+            "value": 17397.79104477612
+          },
+          "min_amount": {
+            "value": 1
+          },
+          "max_amount": {
+            "value": 73000
           }
         },
         {
@@ -28,6 +37,15 @@
           "doc_count": 31,
           "total_amount": {
             "value": 421287.5
+          },
+          "avg_amount": {
+            "value": 13589.91935483871
+          },
+          "min_amount": {
+            "value": 3500
+          },
+          "max_amount": {
+            "value": 30000
           }
         },
         {
@@ -35,6 +53,15 @@
           "doc_count": 22,
           "total_amount": {
             "value": 399075
+          },
+          "avg_amount": {
+            "value": 18139.772727272728
+          },
+          "min_amount": {
+            "value": 2500
+          },
+          "max_amount": {
+            "value": 45000
           }
         },
         {
@@ -42,6 +69,15 @@
           "doc_count": 21,
           "total_amount": {
             "value": 419935
+          },
+          "avg_amount": {
+            "value": 19996.904761904763
+          },
+          "min_amount": {
+            "value": 6500
+          },
+          "max_amount": {
+            "value": 52800
           }
         },
         {
@@ -49,6 +85,15 @@
           "doc_count": 21,
           "total_amount": {
             "value": 299419
+          },
+          "avg_amount": {
+            "value": 14258.047619047618
+          },
+          "min_amount": {
+            "value": 3500
+          },
+          "max_amount": {
+            "value": 25000
           }
         },
         {
@@ -56,6 +101,15 @@
           "doc_count": 16,
           "total_amount": {
             "value": 391640
+          },
+          "avg_amount": {
+            "value": 24477.5
+          },
+          "min_amount": {
+            "value": 8750
+          },
+          "max_amount": {
+            "value": 70400
           }
         },
         {
@@ -63,6 +117,15 @@
           "doc_count": 16,
           "total_amount": {
             "value": 340320
+          },
+          "avg_amount": {
+            "value": 21270
+          },
+          "min_amount": {
+            "value": 4500
+          },
+          "max_amount": {
+            "value": 66560
           }
         },
         {
@@ -70,6 +133,15 @@
           "doc_count": 16,
           "total_amount": {
             "value": 344090
+          },
+          "avg_amount": {
+            "value": 21505.625
+          },
+          "min_amount": {
+            "value": 5000
+          },
+          "max_amount": {
+            "value": 58080
           }
         },
         {
@@ -77,6 +149,15 @@
           "doc_count": 15,
           "total_amount": {
             "value": 245480
+          },
+          "avg_amount": {
+            "value": 16365.333333333334
+          },
+          "min_amount": {
+            "value": 4500
+          },
+          "max_amount": {
+            "value": 44000
           }
         },
         {
@@ -84,6 +165,15 @@
           "doc_count": 11,
           "total_amount": {
             "value": 156672
+          },
+          "avg_amount": {
+            "value": 14242.90909090909
+          },
+          "min_amount": {
+            "value": 4350
+          },
+          "max_amount": {
+            "value": 28072
           }
         }
       ]
