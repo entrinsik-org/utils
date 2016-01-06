@@ -1,6 +1,9 @@
 'use strict';
 
-var should = require('chai').should();
+var chai = require('chai');
+var should = chai.should();
+var sinon = require('sinon');
+chai.use(require('sinon-chai'));
 var Aggregation = require('../lib/aggregation').Aggregation;
 
 describe('AggBuilder', function () {
@@ -25,30 +28,17 @@ describe('AggBuilder', function () {
     });
 
     it('should support callback builder', function () {
-        var agg = new Aggregation()
-            .aggregation('my_agg', function (agg) {
-                agg.terms({ foo: 'bar' });
-            })
-            .build();
+        var spy = sinon.spy();
 
-        agg.should.deep.equal({
-            aggregations: {
-                my_agg: {
-                    terms: {
-                        foo: 'bar'
-                    }
-                }
-            }
-        });
+        new Aggregation().aggregation('my_agg', { terms: { field: 'foo' } }, spy);
+
+        spy.should.have.been.called;
     });
 
     it('should support a term with a nested sum', function () {
         var agg = new Aggregation()
-            .aggregation('states', function (agg) {
-                agg.terms({ field: 'state' });
-                agg.aggregation('total_amount', function (agg) {
-                    agg.sum({ field: 'amount' });
-                })
+            .aggregation('states', Aggregation.terms('state'), function (agg) {
+                agg.aggregation('total_amount', Aggregation.sum('amount'));
             })
             .build();
 
@@ -70,14 +60,13 @@ describe('AggBuilder', function () {
 
     it('should support setting mapper functions', function () {
         var agg = new Aggregation()
-            .aggregation('states', function (agg) {
-                agg.terms({ field: 'state' })
-                    .mapper(function (result) {
-                        return result.buckets.reduce(function (acc, bucket) {
-                            acc[bucket.key] = bucket.doc_count;
-                            return acc;
-                        }, {});
-                    });
+            .aggregation('states', Aggregation.terms('state'), function (agg) {
+                agg.mapper(function (result) {
+                    return result.buckets.reduce(function (acc, bucket) {
+                        acc[bucket.key] = bucket.doc_count;
+                        return acc;
+                    }, {});
+                });
             });
 
         var data = require('./states.json');
@@ -99,10 +88,7 @@ describe('AggBuilder', function () {
     });
 
     it('should provide a sane default mapper for terms', function () {
-        var agg = new Aggregation()
-            .aggregation('states', function (agg) {
-                agg.terms({ field: 'state' });
-            });
+        var agg = new Aggregation().aggregation('states', Aggregation.terms('state'));
 
         var data = require('./states.json');
         var res = agg.map(data);
@@ -124,17 +110,54 @@ describe('AggBuilder', function () {
 
     it('should support nested mappers', function () {
         var agg = new Aggregation()
-            .aggregation('states', function (agg) {
-                agg.terms({ field: 'state' })
-                    .aggregation('total_amount', function (agg) {
-                        agg.sum({ field: 'amount' })
-                            .mapper(function (value) {
-                                return value.value;
-                            });
+            .aggregation('states', Aggregation.terms('state'), function (agg) {
+                agg.aggregation('total_amount', Aggregation.sum('amount'), function (agg) {
+                    agg.mapper(function (value) {
+                        return value.value;
                     });
+                });
             });
         var data = require('./state_sum_amount.json');
         var res = agg.map(data);
+        res.should.deep.equal({
+            states: {
+                CA: { count: 31, total_amount: 421287.5 },
+                IL: { count: 16, total_amount: 391640 },
+                MA: { count: 15, total_amount: 245480 },
+                NC: { count: 67, total_amount: 1165652 },
+                NJ: { count: 22, total_amount: 399075 },
+                NY: { count: 21, total_amount: 419935 },
+                OH: { count: 16, total_amount: 340320 },
+                PA: { count: 21, total_amount: 299419 },
+                SC: { count: 11, total_amount: 156672 },
+                TX: { count: 16, total_amount: 344090 }
+            }
+        });
+    });
+
+    it('should support new api', function () {
+        var agg = new Aggregation()
+            .agg('states', Aggregation.terms('state'), function (agg) {
+                agg.agg('total_amount', Aggregation.sum('amount'));
+            });
+
+        agg.build().should.deep.equal({
+            aggregations: {
+                states: {
+                    terms: {
+                        field: 'state'
+                    },
+                    aggregations: {
+                        total_amount: {
+                            sum: { field: 'amount' }
+                        }
+                    }
+                }
+            }
+        });
+
+        var res = agg.map(require('./state_sum_amount.json'));
+
         res.should.deep.equal({
             states: {
                 CA: { count: 31, total_amount: 421287.5 },
