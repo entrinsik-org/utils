@@ -1,0 +1,56 @@
+{
+  "took": 1,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 504,
+    "max_score": 0,
+    "hits": []
+  },
+  "aggregations": {
+    "my_histogram": {
+      "buckets": [
+        {
+          "key": 0,
+          "doc_count": 115
+        },
+        {
+          "key": 10000,
+          "doc_count": 225
+        },
+        {
+          "key": 20000,
+          "doc_count": 109
+        },
+        {
+          "key": 30000,
+          "doc_count": 25
+        },
+        {
+          "key": 40000,
+          "doc_count": 10
+        },
+        {
+          "key": 50000,
+          "doc_count": 10
+        },
+        {
+          "key": 60000,
+          "doc_count": 5
+        },
+        {
+          "key": 70000,
+          "doc_count": 4
+        },
+        {
+          "key": 100000,
+          "doc_count": 1
+        }
+      ]
+    }
+  }
+}

@@ -469,4 +469,149 @@ describe('AggBuilder', function () {
             ]
         });
     });
+
+    it('should support a histogram', function () {
+        new Aggregation()
+            .aggregation('my_histogram', Aggregation.histogram({ field: 'amount', interval: 10000}))
+            .build()
+            .should.deep.equal({
+            "aggregations": {
+                "my_histogram": {
+                    "histogram": {
+                        "field": "amount",
+                        "interval": 10000
+                    }
+                }
+            }
+        });
+    });
+
+    it('should parse histogram data', function () {
+        new Aggregation()
+            .aggregation('my_histogram', Aggregation.histogram({ field: 'amount', interval: 10000}))
+            .map(require('./histogram_counts.json'))
+            .should.deep.equal({
+            "my_histogram": [
+                {
+                    "count": 115,
+                    "value": 0
+                },
+                {
+                    "count": 225,
+                    "value": 10000
+                },
+                {
+                    "count": 109,
+                    "value": 20000
+                },
+                {
+                    "count": 25,
+                    "value": 30000
+                },
+                {
+                    "count": 10,
+                    "value": 40000
+                },
+                {
+                    "count": 10,
+                    "value": 50000
+                },
+                {
+                    "count": 5,
+                    "value": 60000
+                },
+                {
+                    "count": 4,
+                    "value": 70000
+                },
+                {
+                    "count": 1,
+                    "value": 100000
+                }
+            ]
+        });
+    });
+
+    it('should support a date histogram', function () {
+        new Aggregation()
+            .aggregation('counts_over_time', Aggregation.dateHistogram('date_closed'))
+            .build()
+            .should.deep.equal({
+                "aggregations": {
+                    "counts_over_time": {
+                        "date_histogram": {
+                            "field": "date_closed",
+                            "interval": "month"
+                        }
+                    }
+                }
+            });
+    });
+
+    it('should parse histogram data', function () {
+        new Aggregation()
+            .aggregation('counts_over_time', Aggregation.dateHistogram({ field: 'date_closed', interval: 'year'}), function(agg) {
+                agg.aggregation('total_amount', Aggregation.sum('amount'))
+            })
+            .map(require('./date_histogram_counts.json'))
+            .should.deep.equal({
+            "counts_over_time": [
+                {
+                    "count": 1,
+                    "date": "2003-01-01T00:00:00.000Z",
+                    "total_amount": 17500
+                },
+                {
+                    "count": 47,
+                    "date": "2008-01-01T00:00:00.000Z",
+                    "total_amount": 831670
+                },
+                {
+                    "count": 17,
+                    "date": "2009-01-01T00:00:00.000Z",
+                    "total_amount": 279430
+                },
+                {
+                    "count": 36,
+                    "date": "2010-01-01T00:00:00.000Z",
+                    "total_amount": 658982
+                },
+                {
+                    "count": 75,
+                    "date": "2011-01-01T00:00:00.000Z",
+                    "total_amount": 1368760
+                },
+                {
+                    "count": 118,
+                    "date": "2012-01-01T00:00:00.000Z",
+                    "total_amount": 1783493.5
+                },
+                {
+                    "count": 60,
+                    "date": "2013-01-01T00:00:00.000Z",
+                    "total_amount": 1251663
+                },
+                {
+                    "count": 100,
+                    "date": "2014-01-01T00:00:00.000Z",
+                    "total_amount": 1942801
+                },
+                {
+                    "count": 46,
+                    "date": "2015-01-01T00:00:00.000Z",
+                    "total_amount": 872370
+                },
+                {
+                    "count": 3,
+                    "date": "2016-01-01T00:00:00.000Z",
+                    "total_amount": 47942
+                },
+                {
+                    "count": 1,
+                    "date": "2017-01-01T00:00:00.000Z",
+                    "total_amount": 67000
+                }
+            ]
+        });
+    });
 });

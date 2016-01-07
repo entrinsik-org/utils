@@ -1,0 +1,108 @@
+{
+  "took": 1,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "hits": {
+    "total": 504,
+    "max_score": 0,
+    "hits": []
+  },
+  "aggregations": {
+    "counts_over_time": {
+      "buckets": [
+        {
+          "key_as_string": "2003-01-01T00:00:00.000Z",
+          "key": 1041379200000,
+          "doc_count": 1,
+          "total_amount": {
+            "value": 17500
+          }
+        },
+        {
+          "key_as_string": "2008-01-01T00:00:00.000Z",
+          "key": 1199145600000,
+          "doc_count": 47,
+          "total_amount": {
+            "value": 831670
+          }
+        },
+        {
+          "key_as_string": "2009-01-01T00:00:00.000Z",
+          "key": 1230768000000,
+          "doc_count": 17,
+          "total_amount": {
+            "value": 279430
+          }
+        },
+        {
+          "key_as_string": "2010-01-01T00:00:00.000Z",
+          "key": 1262304000000,
+          "doc_count": 36,
+          "total_amount": {
+            "value": 658982
+          }
+        },
+        {
+          "key_as_string": "2011-01-01T00:00:00.000Z",
+          "key": 1293840000000,
+          "doc_count": 75,
+          "total_amount": {
+            "value": 1368760
+          }
+        },
+        {
+          "key_as_string": "2012-01-01T00:00:00.000Z",
+          "key": 1325376000000,
+          "doc_count": 118,
+          "total_amount": {
+            "value": 1783493.5
+          }
+        },
+        {
+          "key_as_string": "2013-01-01T00:00:00.000Z",
+          "key": 1356998400000,
+          "doc_count": 60,
+          "total_amount": {
+            "value": 1251663
+          }
+        },
+        {
+          "key_as_string": "2014-01-01T00:00:00.000Z",
+          "key": 1388534400000,
+          "doc_count": 100,
+          "total_amount": {
+            "value": 1942801
+          }
+        },
+        {
+          "key_as_string": "2015-01-01T00:00:00.000Z",
+          "key": 1420070400000,
+          "doc_count": 46,
+          "total_amount": {
+            "value": 872370
+          }
+        },
+        {
+          "key_as_string": "2016-01-01T00:00:00.000Z",
+          "key": 1451606400000,
+          "doc_count": 3,
+          "total_amount": {
+            "value": 47942
+          }
+        },
+        {
+          "key_as_string": "2017-01-01T00:00:00.000Z",
+          "key": 1483228800000,
+          "doc_count": 1,
+          "total_amount": {
+            "value": 67000
+          }
+        }
+      ]
+    }
+  }
+}
