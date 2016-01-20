@@ -1,0 +1,216 @@
+{
+  "took": 4,
+  "timed_out": false,
+  "_shards": {
+    "total": 31,
+    "successful": 31,
+    "failed": 0
+  },
+  "hits": {
+    "total": 410487,
+    "max_score": 0,
+    "hits": []
+  },
+  "aggregations": {
+    "geohash_grid": {
+      "buckets": [
+        {
+          "key": "hf",
+          "doc_count": 18439
+        },
+        {
+          "key": "hc",
+          "doc_count": 5088
+        },
+        {
+          "key": "h9",
+          "doc_count": 842
+        },
+        {
+          "key": "hb",
+          "doc_count": 683
+        },
+        {
+          "key": "0v",
+          "doc_count": 378
+        },
+        {
+          "key": "09",
+          "doc_count": 246
+        },
+        {
+          "key": "0b",
+          "doc_count": 183
+        },
+        {
+          "key": "h8",
+          "doc_count": 174
+        },
+        {
+          "key": "08",
+          "doc_count": 166
+        },
+        {
+          "key": "1j",
+          "doc_count": 137
+        },
+        {
+          "key": "0f",
+          "doc_count": 133
+        },
+        {
+          "key": "0s",
+          "doc_count": 91
+        },
+        {
+          "key": "0u",
+          "doc_count": 89
+        },
+        {
+          "key": "0g",
+          "doc_count": 68
+        },
+        {
+          "key": "0c",
+          "doc_count": 68
+        },
+        {
+          "key": "0e",
+          "doc_count": 67
+        },
+        {
+          "key": "dn",
+          "doc_count": 61
+        },
+        {
+          "key": "dp",
+          "doc_count": 50
+        },
+        {
+          "key": "dq",
+          "doc_count": 42
+        },
+        {
+          "key": "dr",
+          "doc_count": 37
+        },
+        {
+          "key": "9q",
+          "doc_count": 29
+        },
+        {
+          "key": "2k",
+          "doc_count": 18
+        },
+        {
+          "key": "36",
+          "doc_count": 16
+        },
+        {
+          "key": "9v",
+          "doc_count": 15
+        },
+        {
+          "key": "9y",
+          "doc_count": 14
+        },
+        {
+          "key": "hg",
+          "doc_count": 13
+        },
+        {
+          "key": "9z",
+          "doc_count": 13
+        },
+        {
+          "key": "0d",
+          "doc_count": 13
+        },
+        {
+          "key": "dj",
+          "doc_count": 11
+        },
+        {
+          "key": "1h",
+          "doc_count": 11
+        },
+        {
+          "key": "27",
+          "doc_count": 8
+        },
+        {
+          "key": "15",
+          "doc_count": 8
+        },
+        {
+          "key": "11",
+          "doc_count": 8
+        },
+        {
+          "key": "9x",
+          "doc_count": 7
+        },
+        {
+          "key": "10",
+          "doc_count": 7
+        },
+        {
+          "key": "9r",
+          "doc_count": 6
+        },
+        {
+          "key": "0y",
+          "doc_count": 6
+        },
+        {
+          "key": "j0",
+          "doc_count": 5
+        },
+        {
+          "key": "c2",
+          "doc_count": 5
+        },
+        {
+          "key": "9m",
+          "doc_count": 5
+        },
+        {
+          "key": "dh",
+          "doc_count": 3
+        },
+        {
+          "key": "1n",
+          "doc_count": 3
+        },
+        {
+          "key": "9w",
+          "doc_count": 1
+        },
+        {
+          "key": "9u",
+          "doc_count": 1
+        },
+        {
+          "key": "9t",
+          "doc_count": 1
+        },
+        {
+          "key": "3m",
+          "doc_count": 1
+        },
+        {
+          "key": "37",
+          "doc_count": 1
+        },
+        {
+          "key": "1r",
+          "doc_count": 1
+        },
+        {
+          "key": "0t",
+          "doc_count": 1
+        }
+      ]
+    }
+  }
+}

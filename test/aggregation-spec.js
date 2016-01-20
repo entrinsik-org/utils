@@ -614,4 +614,176 @@ describe('AggBuilder', function () {
             ]
         });
     });
+
+    it('should support a geohash grid', function () {
+        new Aggregation()
+            .aggregation('geohash_grid', Aggregation.geohashGrid('location'))
+            .build()
+            .should.deep.equal({
+            "aggregations": {
+                "geohash_grid": {
+                    "geohash_grid": {
+                        "field": "location"
+                    }
+                }
+            }
+        });
+    });
+
+    it('should parse geohash grid data', function () {
+        new Aggregation()
+            .aggregation('geohash_grid', Aggregation.geohashGrid({ field: 'location', precision: 2 }))
+            .map(require('./geohash_grid.json'))
+            .should.deep.equal({
+            "geohash_grid": {
+                "10": {
+                    "count": 7
+                },
+                "11": {
+                    "count": 8
+                },
+                "15": {
+                    "count": 8
+                },
+                "27": {
+                    "count": 8
+                },
+                "36": {
+                    "count": 16
+                },
+                "37": {
+                    "count": 1
+                },
+                "08": {
+                    "count": 166
+                },
+                "09": {
+                    "count": 246
+                },
+                "0b": {
+                    "count": 183
+                },
+                "0c": {
+                    "count": 68
+                },
+                "0d": {
+                    "count": 13
+                },
+                "0e": {
+                    "count": 67
+                },
+                "0f": {
+                    "count": 133
+                },
+                "0g": {
+                    "count": 68
+                },
+                "0s": {
+                    "count": 91
+                },
+                "0t": {
+                    "count": 1
+                },
+                "0u": {
+                    "count": 89
+                },
+                "0v": {
+                    "count": 378
+                },
+                "0y": {
+                    "count": 6
+                },
+                "1h": {
+                    "count": 11
+                },
+                "1j": {
+                    "count": 137
+                },
+                "1n": {
+                    "count": 3
+                },
+                "1r": {
+                    "count": 1
+                },
+                "2k": {
+                    "count": 18
+                },
+                "3m": {
+                    "count": 1
+                },
+                "9m": {
+                    "count": 5
+                },
+                "9q": {
+                    "count": 29
+                },
+                "9r": {
+                    "count": 6
+                },
+                "9t": {
+                    "count": 1
+                },
+                "9u": {
+                    "count": 1
+                },
+                "9v": {
+                    "count": 15
+                },
+                "9w": {
+                    "count": 1
+                },
+                "9x": {
+                    "count": 7
+                },
+                "9y": {
+                    "count": 14
+                },
+                "9z": {
+                    "count": 13
+                },
+                "c2": {
+                    "count": 5
+                },
+                "dh": {
+                    "count": 3
+                },
+                "dj": {
+                    "count": 11
+                },
+                "dn": {
+                    "count": 61
+                },
+                "dp": {
+                    "count": 50
+                },
+                "dq": {
+                    "count": 42
+                },
+                "dr": {
+                    "count": 37
+                },
+                "h8": {
+                    "count": 174
+                },
+                "h9": {
+                    "count": 842
+                },
+                "hb": {
+                    "count": 683
+                },
+                "hc": {
+                    "count": 5088
+                },
+                "hf": {
+                    "count": 18439
+                },
+                "hg": {
+                    "count": 13
+                },
+                "j0": {
+                    "count": 5
+                }
+            }
+        });
+    });
 });
