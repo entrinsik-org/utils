@@ -532,6 +532,40 @@ describe('AggBuilder', function () {
         });
     });
 
+    it('should support a percentiles aggregation', function () {
+        new Aggregation()
+            .aggregation('data', Aggregation.percentiles('amount'))
+            .build()
+            .should.deep.equal({
+            "aggregations": {
+                "data": {
+                    "percentiles": {
+                        "field": "amount"
+                    }
+                }
+            }
+        });
+    });
+
+    it('should parse percentiles data', function () {
+        new Aggregation()
+            .aggregation('data', Aggregation.percentiles('amount'))
+            .map(require('./percentiles.json'))
+            .should.deep.equal({
+            "data": {
+                "values": {
+                    "1.0": 22.189,
+                    "25.0": 154.14285714285717,
+                    "5.0": 40.46666666666667,
+                    "50.0": 360.24615384615385,
+                    "75.0": 723.8051020408163,
+                    "95.0": 1963.7789999999986,
+                    "99.0": 4637.477600000015,
+                }
+            }
+        });
+    });
+
     it('should support a date histogram', function () {
         new Aggregation()
             .aggregation('counts_over_time', Aggregation.dateHistogram('date_closed'))
