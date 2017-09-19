@@ -9,6 +9,7 @@ var ConstantAggregateExpression = require('../lib/constant-aggregate-expression'
 var AggregateCalculationExpression = require('../lib/aggregate-calculation-expression').AggregateCalculationExpression;
 var COUNT = 'count', SUM = 'sum', AVG = 'avg', MAX = 'max', MIN = 'min', VALUE_COUNT = 'value_count',
     CARDINALITY = 'cardinality';
+var _ = require('lodash');
 
 var revenue = {
     label: 'Revenue',
@@ -188,5 +189,10 @@ describe('Aggregate Expression Parser', function () {
         AggregateExpression.parse(datasetFields, 'mult(sub(sum:cost,avg:revenue), ratio(count,4))')
             .label().should.deep.equal('(Total Cost - Average Revenue) * (Count / 4)');
     });
+    it('should provide a user-friendly error message', function() {
+        var attempt = _.attempt(AggregateExpression.parse, datasetFields, 'foo');
+        _.isError(attempt).should.be.true;
+        attempt.message.should.deep.equal('"foo" is not a valid aggregate expression.');
 
+    });
 });
