@@ -1,17 +1,17 @@
 'use strict';
 
-var chai = require('chai');
-var should = chai.should();
-var sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const sinon = require('sinon');
 chai.use(require('sinon-chai'));
-var AggregateExpression = require('../lib/aggregate-expression').AggregateExpression;
-var ConstantAggregateExpression = require('../lib/constant-aggregate-expression').ConstantAggregateExpression;
-var AggregateCalculationExpression = require('../lib/aggregate-calculation-expression').AggregateCalculationExpression;
-var COUNT = 'count', SUM = 'sum', AVG = 'avg', MAX = 'max', MIN = 'min', VALUE_COUNT = 'value_count',
+const AggregateExpression = require('../lib/aggregate-expression').AggregateExpression;
+const ConstantAggregateExpression = require('../lib/constant-aggregate-expression').ConstantAggregateExpression;
+const AggregateCalculationExpression = require('../lib/aggregate-calculation-expression').AggregateCalculationExpression;
+const COUNT = 'count', SUM = 'sum', AVG = 'avg', MAX = 'max', MIN = 'min', VALUE_COUNT = 'value_count',
     CARDINALITY = 'cardinality';
-var _ = require('lodash');
+const _ = require('lodash');
 
-var revenue = {
+const revenue = {
     label: 'Revenue',
     id: 1,
     name: 'revenue',
@@ -24,7 +24,7 @@ var revenue = {
     }
 };
 
-var cost = {
+const cost = {
     label: 'Cost',
     id: 2,
     name: 'cost',
@@ -37,7 +37,7 @@ var cost = {
     }
 };
 
-var datasetFields = [revenue, cost];
+const datasetFields = [revenue, cost];
 
 describe('Aggregate Expression Parser', function () {
     it('should exist', function () {
@@ -53,9 +53,9 @@ describe('Aggregate Expression Parser', function () {
         AggregateExpression.parse(datasetFields, 'cardinality:revenue').should.deep.equal(new AggregateExpression(CARDINALITY, revenue));
     });
     it('should parse simple aggregate calculations', function () {
-        var sum = new AggregateExpression(SUM, cost);
-        var count = new AggregateExpression(COUNT);
-        var ratio = AggregateExpression.parse(datasetFields, 'ratio(sum:cost,count)');
+        const sum = new AggregateExpression(SUM, cost);
+        const count = new AggregateExpression(COUNT);
+        const ratio = AggregateExpression.parse(datasetFields, 'ratio(sum:cost,count)');
         should.exist(ratio);
         should.exist(ratio.fn);
         should.exist(ratio.lhs);
@@ -63,7 +63,7 @@ describe('Aggregate Expression Parser', function () {
         ratio.fn.should.equal('ratio');
         ratio.lhs.should.deep.equal(sum);
         ratio.rhs.should.deep.equal(count);
-        var mult = AggregateExpression.parse(datasetFields, 'mult(sum:cost,count)');
+        const mult = AggregateExpression.parse(datasetFields, 'mult(sum:cost,count)');
         should.exist(mult);
         should.exist(mult.fn);
         should.exist(mult.lhs);
@@ -71,7 +71,7 @@ describe('Aggregate Expression Parser', function () {
         mult.fn.should.equal('mult');
         mult.lhs.should.deep.equal(sum);
         mult.rhs.should.deep.equal(count);
-        var add = AggregateExpression.parse(datasetFields, 'add(sum:cost,count)');
+        const add = AggregateExpression.parse(datasetFields, 'add(sum:cost,count)');
         should.exist(add);
         should.exist(add.fn);
         should.exist(add.lhs);
@@ -79,7 +79,7 @@ describe('Aggregate Expression Parser', function () {
         add.fn.should.equal('add');
         add.lhs.should.deep.equal(sum);
         add.rhs.should.deep.equal(count);
-        var sub = AggregateExpression.parse(datasetFields, 'sub(sum:cost,count)');
+        const sub = AggregateExpression.parse(datasetFields, 'sub(sum:cost,count)');
         should.exist(sub);
         should.exist(sub.fn);
         should.exist(sub.lhs);
@@ -89,8 +89,8 @@ describe('Aggregate Expression Parser', function () {
         sub.rhs.should.deep.equal(count);
     });
     it('should parse simple aggregate calculations with constants', function () {
-        var max = new AggregateExpression(MAX, cost);
-        var ratio = AggregateExpression.parse(datasetFields, 'ratio(max:cost,35)');
+        const max = new AggregateExpression(MAX, cost);
+        const ratio = AggregateExpression.parse(datasetFields, 'ratio(max:cost,35)');
         should.exist(ratio);
         should.exist(ratio.fn);
         should.exist(ratio.lhs);
@@ -98,7 +98,7 @@ describe('Aggregate Expression Parser', function () {
         ratio.fn.should.equal('ratio');
         ratio.lhs.should.deep.equal(max);
         ratio.rhs.should.deep.equal(new ConstantAggregateExpression(35));
-        var mult = AggregateExpression.parse(datasetFields, 'mult(3, max:cost)');
+        const mult = AggregateExpression.parse(datasetFields, 'mult(3, max:cost)');
         should.exist(mult);
         should.exist(mult.fn);
         should.exist(mult.lhs);
@@ -106,7 +106,7 @@ describe('Aggregate Expression Parser', function () {
         mult.fn.should.equal('mult');
         mult.lhs.should.deep.equal(new ConstantAggregateExpression(3));
         mult.rhs.should.deep.equal(max);
-        var add = AggregateExpression.parse(datasetFields, 'add(max:cost,0.46)');
+        const add = AggregateExpression.parse(datasetFields, 'add(max:cost,0.46)');
         should.exist(add);
         should.exist(add.fn);
         should.exist(add.lhs);
@@ -114,7 +114,7 @@ describe('Aggregate Expression Parser', function () {
         add.fn.should.equal('add');
         add.lhs.should.deep.equal(max);
         add.rhs.should.deep.equal(new ConstantAggregateExpression(0.46));
-        var sub = AggregateExpression.parse(datasetFields, 'sub(1000.25, max:cost)');
+        const sub = AggregateExpression.parse(datasetFields, 'sub(1000.25, max:cost)');
         should.exist(sub);
         should.exist(sub.fn);
         should.exist(sub.lhs);
@@ -124,12 +124,12 @@ describe('Aggregate Expression Parser', function () {
         sub.rhs.should.deep.equal(max);
     });
     it('should parse nested aggregate calculations', function () {
-        var count = AggregateExpression.parse(datasetFields,'count');
-        var sum = AggregateExpression.parse(datasetFields, 'sum:revenue');
-        var min = AggregateExpression.parse(datasetFields, 'min:cost');
-        var ratio = AggregateExpression.parse(datasetFields, 'ratio(count,sum:revenue)');
+        const count = AggregateExpression.parse(datasetFields,'count');
+        const sum = AggregateExpression.parse(datasetFields, 'sum:revenue');
+        const min = AggregateExpression.parse(datasetFields, 'min:cost');
+        const ratio = AggregateExpression.parse(datasetFields, 'ratio(count,sum:revenue)');
         //mult(3,ratio(count,sum:revenue))
-        var mult = AggregateExpression.parse(datasetFields, 'mult(3,ratio(count,sum:revenue))');
+        const mult = AggregateExpression.parse(datasetFields, 'mult(3,ratio(count,sum:revenue))');
         should.exist(mult);
         should.exist(mult.fn);
         mult.fn.should.deep.equal('mult');
@@ -143,8 +143,8 @@ describe('Aggregate Expression Parser', function () {
         should.exist(mult.rhs.rhs);
         mult.rhs.rhs.should.deep.equal(sum);
         //ratio(sub(sum:revenue,min:cost),ratio(count,sum:revenue))
-        var sub = AggregateExpression.parse(datasetFields, 'sub(sum:revenue,min:cost)');
-        var complex = AggregateExpression.parse(datasetFields, 'ratio(sub(sum:revenue,min:cost),ratio(count,sum:revenue))');
+        const sub = AggregateExpression.parse(datasetFields, 'sub(sum:revenue,min:cost)');
+        const complex = AggregateExpression.parse(datasetFields, 'ratio(sub(sum:revenue,min:cost),ratio(count,sum:revenue))');
         should.exist(complex);
         should.exist(complex.fn);
         complex.fn.should.deep.equal('ratio');
@@ -164,7 +164,7 @@ describe('Aggregate Expression Parser', function () {
         should.exist(complex.rhs.rhs);
         complex.rhs.rhs.should.deep.equal(sum);
         //add(ratio(count,2),ratio(count,2))
-        var expr = AggregateExpression.parse(datasetFields, 'add(ratio(count,2),ratio(count,2))');
+        const expr = AggregateExpression.parse(datasetFields, 'add(ratio(count,2),ratio(count,2))');
         should.exist(expr);
         should.exist(expr.fn);
         expr.fn.should.deep.equal('add');
@@ -190,7 +190,7 @@ describe('Aggregate Expression Parser', function () {
             .label().should.deep.equal('(Total Cost - Average Revenue) * (Count / 4)');
     });
     it('should provide a user-friendly error message', function() {
-        var attempt = _.attempt(AggregateExpression.parse, datasetFields, 'foo');
+        const attempt = _.attempt(AggregateExpression.parse, datasetFields, 'foo');
         _.isError(attempt).should.be.true;
         attempt.message.should.deep.equal('"foo" is not a valid aggregate expression.');
 
