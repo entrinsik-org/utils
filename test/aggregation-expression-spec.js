@@ -37,6 +37,20 @@ const cost = {
     }
 };
 
+const cost2 = {
+    label: 'Cost 2',
+    id: 3,
+    name: 'cost2',
+    datasetId: 4,
+    position: 4,
+    dataType: 'double',
+    typeMapping: { type: 'double' },
+    isNumeric: function () {
+        return true;
+    }
+};
+
+
 const datasetFields = [revenue, cost];
 
 describe('Aggregate Expression Parser', function () {
@@ -194,5 +208,8 @@ describe('Aggregate Expression Parser', function () {
         _.isError(attempt).should.be.true;
         attempt.message.should.deep.equal('"foo" is not a valid aggregate expression.');
 
+    });
+    it('should parse an agreggate expression with a number in it', function() {
+        AggregateExpression.parse([cost2], 'sum:cost2').should.deep.equal(new AggregateExpression(SUM, cost2));
     });
 });
