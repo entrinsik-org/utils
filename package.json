@@ -27,6 +27,8 @@
     "gulp-tag-version": "^1.2.1",
     "jshint-stylish": "^1.0.1",
     "mocha": "^2.2.1",
+    "moment": "^2.11.0",
+    "moment-timezone": "^0.5.20",
     "sinon": "^1.17.2",
     "sinon-chai": "^2.8.0"
   },
