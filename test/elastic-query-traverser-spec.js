@@ -4,7 +4,7 @@ var chai = require('chai');
 var should = chai.should();
 var sinon = require('sinon');
 chai.use(require('sinon-chai'));
-var ElasticQueryTraverser = require('../lib/elastic-query-traverser').ElasticQueryTraverser;
+var elasticDateTranslator = require('../lib/elastic-query-traverser');
 const moment = require('moment-timezone');
 
 describe('query traverser', function () {
@@ -50,8 +50,7 @@ describe('query traverser', function () {
                     }
                 }
             };
-            var EQT = new ElasticQueryTraverser(query);
-            var result = EQT.traverseFilter();
+            var result = elasticDateTranslator(query);
             result.should.deep.equal(expectedQuery);
         });
     });
