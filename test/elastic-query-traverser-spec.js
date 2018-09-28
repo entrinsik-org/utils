@@ -1,11 +1,13 @@
 'use strict';
 
-var chai = require('chai');
-var should = chai.should();
-var sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const sinon = require('sinon');
 chai.use(require('sinon-chai'));
-var ElasticQueryTraverser = require('../lib/elastic-query-traverser').ElasticQueryTraverser;
+const elasticQueryTransformer = require('../lib/elastic-query-transformer');
+const dateKeywords = require('../lib/date-keywords').DateKeywords;
 const moment = require('moment-timezone');
+const _ = require('lodash');
 
 describe('query traverser', function () {
 
@@ -50,8 +52,40 @@ describe('query traverser', function () {
                     }
                 }
             };
-            var EQT = new ElasticQueryTraverser(query);
-            var result = EQT.traverseFilter();
+            var result = elasticQueryTransformer(query, {
+                date_keyword: (query) => {
+                    const translated = dateKeywords(query.date_keyword);
+                    const aDay = 86400000;
+                    const updateQuery = (info) => {
+                        const date = _.isDate(translated) ? translated : new Date(translated);
+                        const offset = date.getTime();
+                        switch (info.operator) {
+                            case 'eq':
+                                return {
+                                    gte: offset,
+                                    lt: offset + aDay
+                                };
+                            case 'gt':
+                                return {
+                                    gt: offset + aDay - 1
+                                };
+                            case 'gte':
+                                return {
+                                    gte: offset
+                                };
+                            case 'lt':
+                                return {
+                                    lte: offset
+                                };
+                            case 'lte':
+                                return {
+                                    lte: offset + aDay - 1
+                                };
+                        }
+                    };
+                    return updateQuery(query.date_keyword);
+                }
+            });
             result.should.deep.equal(expectedQuery);
         });
     });
