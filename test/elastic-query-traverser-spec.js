@@ -52,7 +52,7 @@ describe('query traverser', function () {
                     }
                 }
             };
-            var result = elasticQueryTransformer(query, {
+            const translate = elasticQueryTransformer({
                 date_keyword: (query) => {
                     const translated = dateKeywords(query.date_keyword);
                     const aDay = 86400000;
@@ -86,6 +86,7 @@ describe('query traverser', function () {
                     return updateQuery(query.date_keyword);
                 }
             });
+            const result = translate(query);
             result.should.deep.equal(expectedQuery);
         });
     });
