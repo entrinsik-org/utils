@@ -1,0 +1,65 @@
+{
+  "properties": {
+    "FirstName": {
+      "type": "keyword"
+    },
+    "LastName": {
+      "type": "keyword"
+    },
+    "OrderDate": {
+      "type": "keyword"
+    },
+    "ProductName": {
+      "type": "keyword"
+    },
+    "Quantity": {
+      "type": "long"
+    },
+    "RequiredDate": {
+      "type": "keyword"
+    },
+    "ShipAddress": {
+      "type": "keyword"
+    },
+    "ShipCity": {
+      "type": "keyword"
+    },
+    "ShipCountry": {
+      "type": "keyword"
+    },
+    "ShipPostalCode": {
+      "type": "keyword"
+    },
+    "ShipRegion": {
+      "type": "keyword"
+    },
+    "ShippedDate": {
+      "type": "keyword"
+    },
+    "UnitPrice": {
+      "type": "float"
+    },
+    "location": {
+      "properties": {
+        "lat": {
+          "type": "float"
+        },
+        "lon": {
+          "type": "float"
+        }
+      }
+    },
+    "orderAmount": {
+      "type": "double"
+    },
+    "orderId": {
+      "type": "long"
+    },
+    "salesperson": {
+      "type": "keyword"
+    },
+    "shipState": {
+      "type": "keyword"
+    }
+  }
+}
