@@ -7,7 +7,7 @@
       "type": "keyword"
     },
     "OrderDate": {
-      "type": "keyword"
+      "type": "date"
     },
     "ProductName": {
       "type": "keyword"
@@ -16,7 +16,7 @@
       "type": "long"
     },
     "RequiredDate": {
-      "type": "keyword"
+      "type": "date"
     },
     "ShipAddress": {
       "type": "keyword"
@@ -34,7 +34,7 @@
       "type": "keyword"
     },
     "ShippedDate": {
-      "type": "keyword"
+      "type": "date"
     },
     "UnitPrice": {
       "type": "float"

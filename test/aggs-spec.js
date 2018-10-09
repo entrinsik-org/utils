@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const { create, terms, sum, avg, cardinality, docCount } = require('../lib/aggs.js');
+const { create, terms, sum, avg, cardinality, docCount, dateHistogram, filter, bucketScript } = require('../lib/aggs.js');
 const Client = require('elasticsearch').Client;
 const client = new Client();
 require('chai').should();
@@ -282,6 +282,11 @@ describe('agg builder', function () {
         before(async function () {
             const data = require('./northwind-orders');
             const commands = _(data)
+                .map(r => _.assign(r, {
+                    OrderDate: new Date(r.OrderDate),
+                    ShippedDate: new Date(r.ShippedDate),
+                    RequiredDate: new Date(r.RequiredDate)
+                }))
                 .map(r => [ { index: { _index: 'test-northwind-orders', _type: 'data' } }, r ])
                 .flatten()
                 .value();
@@ -452,6 +457,27 @@ describe('agg builder', function () {
                     ]
                 }
             });
+        });
+
+        it.only('should support a bucket script agg', async function () {
+            const agg = create()
+                .agg(
+                    dateHistogram({ field: 'OrderDate', interval: 'month' }).aggs(
+                        sum('orderAmount').as('total_sales'),
+                        filter({ term: { ShipCountry: 'Switzerland' } }).aggs(
+                            sum('orderAmount').as('sales')
+                        ).as('swiss_sales').transformer(b => b.sales.value),
+                        bucketScript({
+                            buckets_path: {
+                                swissSales: 'swiss_sales>sales',
+                                totalSales: 'total_sales'
+                            },
+                            script: 'params.swissSales / params.totalSales * 100'
+                        }).as('swissPercentage')
+                    ).as('sales_per_month')
+                );
+            const result = await agg.search(client, OPTS);
+            console.log(result);
         });
     });
 });
