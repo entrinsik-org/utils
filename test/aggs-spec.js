@@ -21,10 +21,11 @@ describe('agg builder', function () {
         });
 
         it('should build a state terms / city terms agg', function () {
-            create().aggs(
-                terms('state').as('states')
-                    .aggs(terms('city').as('cities'))
-            ).toJson().should.deep.equal({
+            create().aggs({
+                states: terms('state').aggs({
+                    cities: terms('city')
+                })
+            }).toJson().should.deep.equal({
                 aggs: {
                     states: {
                         terms: {
@@ -218,13 +219,18 @@ describe('agg builder', function () {
 
         it('should support an agg literal', function () {
             create()
-                .agg({ id: 'total', body: { sum: { field: 'amount' } } })
+                .aggs({ total_sales: sum('amount'), average_sales: avg('amount') })
                 .toJson()
                 .should.deep.equal({
-                aggs: {
-                    total: {
-                        sum: {
-                            field: 'amount'
+                "aggs": {
+                    "average_sales": {
+                        "avg": {
+                            "field": "amount"
+                        }
+                    },
+                    "total_sales": {
+                        "sum": {
+                            "field": "amount"
                         }
                     }
                 }
@@ -302,10 +308,15 @@ describe('agg builder', function () {
 
         it('should have a default bucket mapper', async function () {
             const result = await create()
-                .agg(terms('ShipCountry').as('countries').agg(cardinality('ShipCity').as('distinctCities')))
+                .aggs({
+                    countries: terms('ShipCountry').aggs({
+                        distinctCities: cardinality('ShipCity')
+                    })
+                })
+                .get('countries')
                 .search(client, OPTS);
 
-            result.countries.should.deep.equal([
+            result.should.deep.equal([
                 {
                     'doc_count': 352,
                     'key': 'USA',
@@ -362,7 +373,7 @@ describe('agg builder', function () {
         it('should support a bucket agg with a bucket mapper', async function () {
             const result = await create()
                 .agg(
-                    terms('ShipCountry').as('countries').mapper(b => [ b.key, b.distinct, b.doc_count ]).agg(
+                    terms('ShipCountry').as('countries').map(b => [ b.key, b.distinct, b.doc_count ]).agg(
                         cardinality('ShipCity').as('distinct')
                     )
                 )
@@ -384,7 +395,7 @@ describe('agg builder', function () {
 
         it('should support a bucket agg with bucket reducer', async function () {
             const result = await create()
-                .agg(terms('ShipCountry').as('countries').reducer((acc, b) => _.set(acc, [ b.key ], b.doc_count), {}))
+                .agg(terms('ShipCountry').as('countries').reduce((acc, b) => _.set(acc, [ b.key ], b.doc_count), {}))
                 .search(client, OPTS);
 
             result.should.deep.equal({
@@ -405,12 +416,12 @@ describe('agg builder', function () {
 
         it('should support a bucket agg with bucket reducer and child aggs', async function () {
             const result = await create()
-                .agg(
-                    terms('ShipCountry').as('countries').reducer((acc, b) => _.set(acc, [ b.key ], [ b.count, b.total ]), {}).agg(
-                        docCount().as('count'),
-                        sum('orderAmount').as('total').transformer(v => Math.round(v.value))
-                    )
-                )
+                .aggs({
+                    countries: terms('ShipCountry').aggs({
+                        count: docCount(),
+                        total: sum('orderAmount').round()
+                    }).reduce((acc, b) => _.set(acc, [ b.key ], [ b.count, b.total ]), {})
+                })
                 .search(client, OPTS);
 
             result.should.deep.equal({
@@ -459,25 +470,42 @@ describe('agg builder', function () {
             });
         });
 
-        it.only('should support a bucket script agg', async function () {
+        it('should support a key/value agg structure', async function () {
             const agg = create()
-                .agg(
-                    dateHistogram({ field: 'OrderDate', interval: 'month' }).aggs(
-                        sum('orderAmount').as('total_sales'),
-                        filter({ term: { ShipCountry: 'Switzerland' } }).aggs(
-                            sum('orderAmount').as('sales')
-                        ).as('swiss_sales').transformer(b => b.sales.value),
-                        bucketScript({
+                .aggs({
+                    sales_per_month: dateHistogram({ field: 'OrderDate', interval: 'month' }).aggs({
+                        total_sales: sum('orderAmount').round(2),
+                        swiss_sales: filter({ term: { ShipCountry: 'Switzerland' } }).aggs({
+                            sales: sum('orderAmount').round(2)
+                        }).get('sales'),
+                        swiss_pct: bucketScript({
                             buckets_path: {
                                 swissSales: 'swiss_sales>sales',
                                 totalSales: 'total_sales'
                             },
                             script: 'params.swissSales / params.totalSales * 100'
-                        }).as('swissPercentage')
-                    ).as('sales_per_month')
-                );
+                        }).round(2)
+                    }).map(m => _.pick(m, ['key_as_string', 'swiss_sales', 'total_sales', 'swiss_pct']))
+                })
+                .get('sales_per_month')
+                .first();
             const result = await agg.search(client, OPTS);
-            console.log(result);
+            result.should.deep.equal({
+                "key_as_string": "1996-07-01T00:00:00.000Z",
+                "swiss_sales": 2490.5,
+                "total_sales": 19604.9,
+                "swiss_pct": 12.7
+            });
+        });
+
+        it('should support mapper chaining', async function () {
+            const agg = create()
+                .aggs({
+                    sales: sum('orderAmount').thru(() => 100).thru(v => '$' + v)
+                })
+                .get('sales');
+            const result = await agg.search(client, OPTS);
+            result.should.equal('$100');
         });
     });
 });
