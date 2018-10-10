@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const { create, terms, sum, avg, cardinality, docCount, dateHistogram, filter, bucketScript } = require('../lib/aggs.js');
+const { aggregation, terms, sum, avg, cardinality, docCount, dateHistogram, filter, bucketScript } = require('../lib/aggs.js');
 const Client = require('elasticsearch').Client;
 const client = new Client();
 require('chai').should();
@@ -9,7 +9,7 @@ require('chai').should();
 describe('agg builder', function () {
     describe('building', function () {
         it('should build a state terms agg', function () {
-            create().aggs(terms('state').as('state')).toJson().should.deep.equal({
+            aggregation().aggs(terms('state').as('state')).toJson().should.deep.equal({
                 aggs: {
                     state: {
                         terms: {
@@ -21,7 +21,7 @@ describe('agg builder', function () {
         });
 
         it('should build a state terms / city terms agg', function () {
-            create().aggs({
+            aggregation().aggs({
                 states: terms('state').aggs({
                     cities: terms('city')
                 })
@@ -44,7 +44,7 @@ describe('agg builder', function () {
         });
 
         it('should build a state terms / city terms / sum amount agg', function () {
-            create().aggs(
+            aggregation().aggs(
                 terms('state').as('states').aggs(
                     terms('city').as('cities').aggs(
                         sum('amount').as('total')
@@ -76,7 +76,7 @@ describe('agg builder', function () {
         });
 
         it('should build a state terms / city terms / [ sum amount, avg amount ] agg', function () {
-            create().aggs(
+            aggregation().aggs(
                 terms('state').as('states').aggs(
                     terms('city').as('cities').aggs(
                         sum('amount').as('total'),
@@ -114,7 +114,7 @@ describe('agg builder', function () {
         });
 
         it('should nest an array of aggs into a tree', function () {
-            create().nest(
+            aggregation().nest(
                 terms('state').as('states'),
                 terms('city').as('cities'),
                 [
@@ -152,7 +152,7 @@ describe('agg builder', function () {
         });
 
         it('should expand an array of nested parents', function () {
-            create().nest(
+            aggregation().nest(
                 [ terms('salesperson').as('salespeople'), terms('product').as('products') ],
                 terms('country').as('countries'),
                 sum('amount').as('total')
@@ -201,10 +201,8 @@ describe('agg builder', function () {
         });
 
         it('should support an agg built on the fly', function () {
-            create()
-                .agg(
-                    create({ body: { sum: { field: 'amount' } } }).as('total')
-                )
+            aggregation()
+                .aggs({ total: aggregation({ body: { sum: { field: 'amount' } } }) })
                 .toJson()
                 .should.deep.equal({
                 "aggs": {
@@ -218,7 +216,7 @@ describe('agg builder', function () {
         });
 
         it('should support an agg literal', function () {
-            create()
+            aggregation()
                 .aggs({ total_sales: sum('amount'), average_sales: avg('amount') })
                 .toJson()
                 .should.deep.equal({
@@ -238,8 +236,8 @@ describe('agg builder', function () {
         });
 
         it('should support a fully formed configuration', function () {
-            create()
-                .agg(terms({ field: 'ShipCountry', size: 100 }).as('countries'))
+            aggregation()
+                .aggs({ countries: terms({ field: 'ShipCountry', size: 100 }) })
                 .toJson()
                 .should.deep.equal({
                 aggs: {
@@ -302,12 +300,12 @@ describe('agg builder', function () {
         });
 
         it('should support a single metric', async function () {
-            const result = await create().agg(sum('orderAmount').as('total')).search(client, OPTS);
+            const result = await aggregation().aggs({ total: sum('orderAmount') }).search(client, OPTS);
             result.should.have.property('total').that.is.closeTo(1343871.39, 0.001);
         });
 
         it('should have a default bucket mapper', async function () {
-            const result = await create()
+            const result = await aggregation()
                 .aggs({
                     countries: terms('ShipCountry').aggs({
                         distinctCities: cardinality('ShipCity')
@@ -371,12 +369,12 @@ describe('agg builder', function () {
         });
 
         it('should support a bucket agg with a bucket mapper', async function () {
-            const result = await create()
-                .agg(
-                    terms('ShipCountry').as('countries').map(b => [ b.key, b.distinct, b.doc_count ]).agg(
-                        cardinality('ShipCity').as('distinct')
-                    )
-                )
+            const result = await aggregation()
+                .aggs({
+                    countries: terms('ShipCountry').aggs({
+                        distinct: cardinality('ShipCity')
+                    }).map(b => [ b.key, b.distinct, b.doc_count ])
+                })
                 .search(client, OPTS);
 
             result.countries.should.deep.equal([
@@ -394,8 +392,8 @@ describe('agg builder', function () {
         });
 
         it('should support a bucket agg with bucket reducer', async function () {
-            const result = await create()
-                .agg(terms('ShipCountry').as('countries').reduce((acc, b) => _.set(acc, [ b.key ], b.doc_count), {}))
+            const result = await aggregation()
+                .aggs({ countries: terms('ShipCountry').indexByKey() })
                 .search(client, OPTS);
 
             result.should.deep.equal({
@@ -414,8 +412,32 @@ describe('agg builder', function () {
             });
         });
 
+        it('should support a bucket agg with bucketed child agg', async function () {
+            const result = await aggregation()
+                .aggs({
+                    countries: terms('ShipCountry').aggs({
+                        total: sum('orderAmount').round(2)
+                    }).indexByKey()
+                })
+                .get('countries')
+                .search(client, OPTS);
+
+            result.should.deep.equal({
+                "Austria": 139496.63,
+                "Brazil": 111710.68,
+                "Canada": 55334.1,
+                "France": 84387.96,
+                "Germany": 242777.23,
+                "Mexico": 24073.45,
+                "Sweden": 59523.7,
+                "UK": 60616.51,
+                "USA": 263566.98,
+                "Venezuela": 60814.89
+            });
+        });
+
         it('should support a bucket agg with bucket reducer and child aggs', async function () {
-            const result = await create()
+            const result = await aggregation()
                 .aggs({
                     countries: terms('ShipCountry').aggs({
                         count: docCount(),
@@ -471,7 +493,7 @@ describe('agg builder', function () {
         });
 
         it('should support a key/value agg structure', async function () {
-            const agg = create()
+            const agg = aggregation()
                 .aggs({
                     sales_per_month: dateHistogram({ field: 'OrderDate', interval: 'month' }).aggs({
                         total_sales: sum('orderAmount').round(2),
@@ -485,10 +507,12 @@ describe('agg builder', function () {
                             },
                             script: 'params.swissSales / params.totalSales * 100'
                         }).round(2)
-                    }).map(m => _.pick(m, ['key_as_string', 'swiss_sales', 'total_sales', 'swiss_pct']))
+                    })
+                        .multipick([ 'key_as_string', 'swiss_sales', 'total_sales', 'swiss_pct' ])
                 })
                 .get('sales_per_month')
                 .first();
+
             const result = await agg.search(client, OPTS);
             result.should.deep.equal({
                 "key_as_string": "1996-07-01T00:00:00.000Z",
@@ -499,7 +523,7 @@ describe('agg builder', function () {
         });
 
         it('should support mapper chaining', async function () {
-            const agg = create()
+            const agg = aggregation()
                 .aggs({
                     sales: sum('orderAmount').thru(() => 100).thru(v => '$' + v)
                 })
