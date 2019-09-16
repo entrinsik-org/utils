@@ -5,13 +5,17 @@ const stream = require('stream');
 const _ = require('lodash');
 
 describe('predicate', function () {
+    function dataStream (data) {
+        return new stream.Readable({
+            objectMode: true,
+            read () {
+                this.push(data.shift() || null);
+            }
+        });
+    }
+
     it(`should handle an empty object`, () => {
         const test = p({});
-        test('Brad').should.be.true;
-    });
-
-    it(`should handle no supplied object`, () => {
-        const test = p();
         test('Brad').should.be.true;
     });
 
@@ -483,15 +487,9 @@ describe('predicate', function () {
             { first: 'Bradd', last: 'LLeupen' }
         ];
 
-        const source = new stream.Readable({
-            objectMode: true,
-            read () {
-                this.push(data.shift() || null);
-            }
-        });
-
         const vals = [];
-        source.pipe(p.stream(filter))
+        dataStream(data)
+            .pipe(p.stream(filter))
             .pipe(new stream.Writable({
                 objectMode: true,
                 write (rec, enc, next) {
@@ -502,6 +500,62 @@ describe('predicate', function () {
             .on('error', done)
             .on('finish', () => {
                 vals.should.have.length(3);
+                done();
+            });
+    });
+
+    it(`should properly filter via transform stream`, done => {
+        const filter = {
+            $and: [
+                {
+                    oi_sess_cr_id: {
+                        $ne: ``
+                    }
+                },
+                {
+                    $or: [
+                        {
+                            oi_sess_cr_id: {
+                                $eq: [
+                                    `JAVA`,
+                                    `PHP`
+                                ]
+                            }
+                        },
+                        {
+                            oi_sess_cr_id: {
+                                $like: `.*ADOBE.*`
+                            }
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const data = [
+            { name: 'Foo', oi_sess_cr_id: 'JAVA' },
+            { name: 'Foo', oi_sess_cr_id: '' },
+            { name: 'Foo', oi_sess_cr_id: 'ADOBEPHOTO' },
+            { name: 'Foo', oi_sess_cr_id: 'PHP' },
+            { name: 'Foo', oi_sess_cr_id: 'TERR' },
+            { name: 'Foo', oi_sess_cr_id: 'ADOBE' },
+            { name: 'Foo', oi_sess_cr_id: 'JAVASCRIPT' },
+            { name: 'Foo', oi_sess_cr_id: 'INFORMER' },
+        ];
+
+        const vals = [];
+        dataStream(data)
+            .pipe(p.stream(filter))
+            .pipe(new stream.Writable({
+                objectMode: true,
+                write (rec, enc, next) {
+                    vals.push(rec);
+                    next();
+                }
+            }))
+            .on('error', done)
+            .on('finish', () => {
+                vals.should.have.length(4);
                 done();
             });
     });
