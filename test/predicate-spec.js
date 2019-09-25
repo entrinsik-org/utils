@@ -19,6 +19,11 @@ describe('predicate', function () {
         test('Brad').should.be.true;
     });
 
+    it(`should handle undefined`, () => {
+        const test = p();
+        test('Brad').should.be.true;
+    });
+
     describe('$eq', function () {
         it('should compare object equality', function () {
             const test = p({ $eq: 'Brad' });
@@ -556,6 +561,36 @@ describe('predicate', function () {
             .on('error', done)
             .on('finish', () => {
                 vals.should.have.length(4);
+                done();
+            });
+    });
+
+    it(`should behave like a passthrough when an undefined filter is passed to .stream()`, done => {
+        const data = [
+            { name: 'Foo', oi_sess_cr_id: 'JAVA' },
+            { name: 'Foo', oi_sess_cr_id: '' },
+            { name: 'Foo', oi_sess_cr_id: 'ADOBEPHOTO' },
+            { name: 'Foo', oi_sess_cr_id: 'PHP' },
+            { name: 'Foo', oi_sess_cr_id: 'TERR' },
+            { name: 'Foo', oi_sess_cr_id: 'ADOBE' },
+            { name: 'Foo', oi_sess_cr_id: 'JAVASCRIPT' },
+            { name: 'Foo', oi_sess_cr_id: 'INFORMER' },
+        ];
+
+        const vals = [];
+        dataStream(_.cloneDeep(data))
+            .pipe(p.stream())
+            .pipe(new stream.Writable({
+                objectMode: true,
+                write (rec, enc, next) {
+                    vals.push(rec);
+                    next();
+                }
+            }))
+            .on('error', done)
+            .on('finish', () => {
+                vals.should.have.length(8);
+                vals.should.deep.equal(data);
                 done();
             });
     });

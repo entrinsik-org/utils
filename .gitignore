@@ -185,3 +185,10 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# npm pack tarballs
+*.tgz
+
+# local temp directories
+temp
+tmp
