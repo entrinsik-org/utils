@@ -31,6 +31,12 @@ describe('predicate', function () {
             test('Brad').should.be.true;
             test('Hank').should.be.false;
         });
+
+        it(`should handle an array of values as a disjunction [x OR y ...]`, () => {
+            const test = p({ $eq: ['Brad', 'Hank'] });
+            test('Brad').should.be.true;
+            test('Hank').should.be.true;
+        });
     });
 
     describe('$ne', function () {
@@ -38,6 +44,13 @@ describe('predicate', function () {
             const test = p({ $ne: 'Brad' });
             test('Brad').should.be.false;
             test('Hank').should.be.true;
+        });
+
+        it(`should handle an array of values as a conjunction (NOT [x OR y ...])`, () => {
+            const test = p({ $ne: ['Brad', 'Hank'] });
+            test('Brad').should.be.false;
+            test('Hank').should.be.false;
+            test('Foo').should.be.true;
         });
     });
 
@@ -114,6 +127,23 @@ describe('predicate', function () {
             test(d2).should.be.false;
             test(d3).should.be.true;
         });
+
+        it(`should handle an array of 1 value as if it were singular`, () => {
+            const test = p({ $gt: [40] });
+            test(41).should.be.true;
+            test(40).should.be.false;
+            test(39).should.be.false;
+            test(30).should.be.false;
+        });
+
+        it(`should handle an array of values for the predicate as a disjunction [x gt N OR x gt M ...]`, () => {
+            const test = p({ $gt: [40, 30] });
+            test(41).should.be.true;
+            test(40).should.be.true;
+            test(39).should.be.true;
+            test(30).should.be.false;
+            test(29).should.be.false;
+        });
     });
 
     describe('$gte', function () {
@@ -133,6 +163,23 @@ describe('predicate', function () {
             test(d1).should.be.false;
             test(d2).should.be.true;
             test(d3).should.be.true;
+        });
+
+        it(`should handle an array of 1 value as if it were singular`, () => {
+            const test = p({ $gte: [40] });
+            test(41).should.be.true;
+            test(40).should.be.true;
+            test(39).should.be.false;
+            test(30).should.be.false;
+        });
+
+        it(`should handle an array of values for the predicate as a disjunction [x gte N OR x gte M ...]`, () => {
+            const test = p({ $gte: [40, 30] });
+            test(41).should.be.true;
+            test(40).should.be.true;
+            test(39).should.be.true;
+            test(30).should.be.true;
+            test(29).should.be.false;
         });
     });
 
@@ -154,6 +201,23 @@ describe('predicate', function () {
             test(d2).should.be.false;
             test(d3).should.be.false;
         });
+
+        it(`should handle an array of 1 value as if it were singular`, () => {
+            const test = p({ $lt: [40] });
+            test(41).should.be.false;
+            test(40).should.be.false;
+            test(39).should.be.true;
+            test(30).should.be.true;
+        });
+
+        it(`should handle an array of values for the predicate as a disjunction [x lt N OR x lt M ...]`, () => {
+            const test = p({ $lt: [40, 30] });
+            test(41).should.be.false;
+            test(40).should.be.false;
+            test(39).should.be.true;
+            test(30).should.be.true;
+            test(29).should.be.true;
+        });
     });
 
     describe('$lte', function () {
@@ -173,6 +237,23 @@ describe('predicate', function () {
             test(d1).should.be.true;
             test(d2).should.be.true;
             test(d3).should.be.false;
+        });
+
+        it(`should handle an array of 1 value as if it were singular`, () => {
+            const test = p({ $lte: [40] });
+            test(41).should.be.false;
+            test(40).should.be.true;
+            test(39).should.be.true;
+            test(30).should.be.true;
+        });
+
+        it(`should handle an array of values for the predicate as a disjunction [x lte N OR x lte M ...]`, () => {
+            const test = p({ $lte: [40, 30] });
+            test(41).should.be.false;
+            test(40).should.be.true;
+            test(39).should.be.true;
+            test(30).should.be.true;
+            test(29).should.be.true;
         });
     });
 
