@@ -1,6 +1,6 @@
 {
   "name": "ent-utils",
-  "version": "4.7.2",
+  "version": "4.7.3",
   "description": "Utility classes and functions",
   "main": "lib/index.js",
   "directories": {
