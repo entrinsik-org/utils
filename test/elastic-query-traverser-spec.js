@@ -89,6 +89,83 @@ describe('query traverser', function () {
             const result = translate(query);
             result.should.deep.equal(expectedQuery);
         });
+
+        it('should filter out values with "YEAR_BEGIN" without a modifier', function() {
+            var query = {
+                "filter": {
+                    "bool": {
+                        "must": [{
+                            "bool": {
+                                "must": [{
+                                    "range": {
+                                        "OrderDate": {
+                                            "date_keyword": {
+                                                "value": "YEAR_BEGIN",
+                                                "operator": "gte",
+                                                "tz": "Africa/Abidjan"
+                                            }
+                                        }
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }
+            };
+            var expectedQuery = {
+                "filter": {
+                    "bool": {
+                        "must": [{
+                            "bool": {
+                                "must": [{
+                                    "range": {
+                                        "OrderDate": {
+                                            "gte": 1546300800000
+                                        }
+                                    }
+                                }]
+                            }
+                        }]
+                    }
+                }
+            };
+            const translate = elasticQueryTransformer({
+                date_keyword: (query) => {
+                    const translated = dateKeywords(query.date_keyword);
+                    const aDay = 86400000;
+                    const updateQuery = (info) => {
+                        const date = _.isDate(translated) ? translated : new Date(translated);
+                        const offset = date.getTime();
+                        switch (info.operator) {
+                            case 'eq':
+                                return {
+                                    gte: offset,
+                                    lt: offset + aDay
+                                };
+                            case 'gt':
+                                return {
+                                    gt: offset + aDay - 1
+                                };
+                            case 'gte':
+                                return {
+                                    gte: offset
+                                };
+                            case 'lt':
+                                return {
+                                    lte: offset
+                                };
+                            case 'lte':
+                                return {
+                                    lte: offset + aDay - 1
+                                };
+                        }
+                    };
+                    return updateQuery(query.date_keyword);
+                }
+            });
+            const result = translate(query);
+            result.should.deep.equal(expectedQuery);
+        });
     });
 
 });
