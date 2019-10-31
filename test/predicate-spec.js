@@ -4,7 +4,7 @@ const p = require('../lib/predicate');
 const stream = require('stream');
 const _ = require('lodash');
 
-describe('predicate', function () {
+describe.only('predicate', function () {
     function dataStream (data) {
         return new stream.Readable({
             objectMode: true,
@@ -96,6 +96,45 @@ describe('predicate', function () {
             const test = p({ first: { $ne: 'Brad' }, last: 'Leupen' });
             test({ first: 'Brad', last: 'Leupen' }).should.be.false;
             test({ first: 'Hank', last: 'Leupen' }).should.be.true;
+        });
+
+        it(`should allow leniency to pass the test of an object when the object does not have the property but still perform normally when the property exists`, () => {
+            // shorthand
+            const shTest = p({ first: 'Brad' }, true);
+            shTest({ foo: 'bar' }).should.be.true;
+            shTest({ foo: 'bar', first: 'Brad' }).should.be.true;
+            shTest({ foo: 'bar', first: 'Hank' }).should.be.false;
+            // mediumhand
+            const mhTest = p({ $prop: { first: 'Brad' } }, true);
+            mhTest({ foo: 'bar' }).should.be.true;
+            mhTest({ foo: 'bar', first: 'Brad' }).should.be.true;
+            mhTest({ foo: 'bar', first: 'Hank' }).should.be.false;
+            // longhand
+            const lhTest = p({ $prop: { first: { $eq: 'Brad' } } }, true);
+            lhTest({ foo: 'bar' }).should.be.true;
+            lhTest({ foo: 'bar', first: 'Brad' }).should.be.true;
+            lhTest({ foo: 'bar', first: 'Hank' }).should.be.false;
+            // backhand neq
+            const bhTest = p({ first: { $ne: 'Brad' } }, true);
+            bhTest({ foo: 'bar' }).should.be.true;
+            bhTest({ foo: 'bar', first: 'Brad' }).should.be.false;
+            bhTest({ foo: 'bar', first: 'Hank' }).should.be.true;
+            // IN
+            const inTest = p({ first: ['Brad', 'Hank'] }, true);
+            inTest({ foo: 'bar' }).should.be.true;
+            inTest({ foo: 'bar', first: 'Brad' }).should.be.true;
+            inTest({ foo: 'bar', first: 'Hank' }).should.be.true;
+            inTest({ foo: 'bar', first: 'Foo' }).should.be.false;
+            // conjoined
+            const conTest = p({ first: 'Brad', last: 'Leupen' }, true);
+            conTest({ foo: 'bar' }).should.be.true;
+            conTest({ foo: 'bar', first: 'Brad' }).should.be.true;
+            conTest({ foo: 'bar', first: 'Hank' }).should.be.false;
+            conTest({ foo: 'bar', last: 'Leupen' }).should.be.true;
+            conTest({ foo: 'bar', last: 'Pitt' }).should.be.false;
+            conTest({ foo: 'bar', first: 'Brad', last: 'Leupen' }).should.be.true;
+            conTest({ foo: 'bar', first: 'Hank', last: 'Leupen' }).should.be.false;
+            conTest({ foo: 'bar', first: 'Brad', last: 'Pitt' }).should.be.false;
         });
     });
 
@@ -674,5 +713,10 @@ describe('predicate', function () {
                 vals.should.deep.equal(data);
                 done();
             });
+    });
+
+    it(`should allow leniency to pass property tests when a record does not have the property`, () => {
+
+
     });
 });
