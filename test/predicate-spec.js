@@ -4,7 +4,7 @@ const p = require('../lib/predicate');
 const stream = require('stream');
 const _ = require('lodash');
 
-describe.only('predicate', function () {
+describe('predicate', function () {
     function dataStream (data) {
         return new stream.Readable({
             objectMode: true,
