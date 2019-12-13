@@ -46,7 +46,7 @@ describe('predicate', function () {
             test('Hank').should.be.true;
         });
 
-        it(`should handle an array of values as a conjunction (NOT [x OR y ...])`, () => {
+        it(`should handle an array of values as a conjunction/negated disjunction (NOT [x OR y ...])`, () => {
             const test = p({ $ne: ['Brad', 'Hank'] });
             test('Brad').should.be.false;
             test('Hank').should.be.false;
@@ -414,6 +414,21 @@ describe('predicate', function () {
             test1('FoO').should.be.true;
             test1('bar').should.be.false;
         });
+
+        it(`should handle an array of values as a disjunction [like x OR like y OR ...]`, () => {
+            const test = p({ $like: [`fo*`, `ba*`] });
+
+            test('foo').should.be.true;
+            test('fo').should.be.true;
+            test('ooffoo').should.be.true;
+            test('bar').should.be.true;
+            test('barrr').should.be.true;
+            test('baaaaar').should.be.true;
+            test('Fo').should.be.false;
+            test('Ba').should.be.false;
+            test('car').should.be.false;
+            test('foobar').should.be.true;
+        });
     });
 
     describe(`$notLike`, () => {
@@ -459,6 +474,21 @@ describe('predicate', function () {
             test1('Foo').should.be.true;
             test1('FoO').should.be.false;
             test1('bar').should.be.true;
+        });
+
+        it(`should handle an array of values as a conjunction/negated disjunction (NOT [like x OR like y OR ...])`, () => {
+            const test = p({ $notLike: [`fo*`, `ba*`] });
+
+            test('foo').should.be.false;
+            test('fo').should.be.false;
+            test('ooffoo').should.be.false;
+            test('bar').should.be.false;
+            test('barrr').should.be.false;
+            test('baaaaar').should.be.false;
+            test('Fo').should.be.true;
+            test('Ba').should.be.true;
+            test('car').should.be.true;
+            test('foobar').should.be.false;
         });
     });
 
@@ -509,6 +539,21 @@ describe('predicate', function () {
             test1('FoO').should.be.true;
             test1('bar').should.be.false;
         });
+
+        it(`should handle an array of values as a disjunction [ilike x OR ilike y OR ...]`, () => {
+            const test = p({ $ilike: [`fO*`, `bA*`] });
+
+            test('FOO').should.be.true;
+            test('FO').should.be.true;
+            test('OOFOO').should.be.true;
+            test('BAR').should.be.true;
+            test('BARRR').should.be.true;
+            test('BAAAAAR').should.be.true;
+            test('fo').should.be.true;
+            test('ba').should.be.true;
+            test('ar').should.be.false;
+            test('FoObAr').should.be.true;
+        });
     });
 
     describe(`$notIlike`, () => {
@@ -556,6 +601,21 @@ describe('predicate', function () {
             test1('Foo').should.be.false;
             test1('FoO').should.be.false;
             test('bar').should.be.true;
+        });
+
+        it(`should handle an array of values as a conjunction/negated disjunction (NOT [ilike x OR ilike y OR ...])`, () => {
+            const test = p({ $notIlike: [`fO*`, `bA*`] });
+
+            test('FOO').should.be.false;
+            test('FO').should.be.false;
+            test('OOFOO').should.be.false;
+            test('BAR').should.be.false;
+            test('BARRR').should.be.false;
+            test('BAAAAAR').should.be.false;
+            test('fo').should.be.false;
+            test('ba').should.be.false;
+            test('ar').should.be.true;
+            test('FoObAr').should.be.false;
         });
     });
 
