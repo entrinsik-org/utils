@@ -32,10 +32,10 @@
     "sinon-chai": "~2.14.0"
   },
   "dependencies": {
+    "joi": "^9.0.4",
+    "lodash": "^4.0.0",
     "moment": "~2.18.1",
     "moment-timezone": "^0.5.20",
-    "urijs": "^1.14.2",
-    "joi": "^9.0.4",
-    "lodash": "^3.10.1"
+    "urijs": "^1.14.2"
   }
 }
