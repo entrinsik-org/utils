@@ -37,6 +37,17 @@ describe('predicate', function () {
             test('Brad').should.be.true;
             test('Hank').should.be.true;
         });
+
+        it('should handle dates', () => {
+            const test = p( { $eq: new Date('01/13/1992') } );
+            test(new Date('01/13/1992')).should.be.true;
+        });
+
+        it('should handle an array of dates', () => {
+            const test = p( { $eq: [new Date('01/13/1992'), new Date('04/02/1993')] } );
+            test(new Date('01/13/1992')).should.be.true;
+            test(new Date('04/02/1993')).should.be.true;
+        });
     });
 
     describe('$ne', function () {
